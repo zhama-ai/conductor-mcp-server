@@ -1,242 +1,180 @@
-# @zhama/mcp-server Examples
+# TCare MCP 服务器
 
-This directory contains examples demonstrating how to use the `@zhama/mcp-server` npm package to build your own MCP (Model Context Protocol) servers.
+这是一个基于 TypeScript 的 MCP（模型上下文协议）服务器，专为 TCare 医疗系统设计，用于提供医疗数据管理和患者信息查询功能。
 
-## Quick Start
+## 📋 项目概述
 
-### Installation
+本项目是一个医疗领域的 MCP 服务器，集成了以下核心功能：
+- 📊 患者信息查询工具
+- 📝 电子病历保存工具
+- 🔧 基于装饰器模式的工具框架
+- ⚙️ 灵活的配置管理系统
 
-First, install the package:
+## 🏗️ 项目架构
 
-```bash
-npm install @zhama/mcp-server
+```
+src/
+├── index.ts                # 主入口文件，服务器启动和配置
+├── config/
+│   └── index.ts           # 环境配置和验证
+└── tools/
+    ├── index.ts           # 工具导出
+    ├── MedicalRecordTool.ts   # 电子病历保存工具
+    └── PatientInfoTool.ts     # 患者信息查询工具
 ```
 
-### Basic Example
+## 🚀 核心功能
 
-Run the basic server example:
+### 1. 患者信息查询工具 (PatientInfoTool)
 
-```bash
-# Development mode (TypeScript)
-npm run example:basic
+**功能描述**: 从数据库查询患者基本信息
 
-# With specific arguments
-npx ts-node examples/basic-server.ts --stdio
-npx ts-node examples/basic-server.ts --port=3001
+**输入参数**:
+- `tenantId` (必需): 租户ID，用于多租户隔离
+- `storeId` (必需): 门店ID，标识特定医疗机构
+- `patientName` (必需): 患者姓名
+
+**返回数据**:
+```json
+{
+  "code": 200,
+  "msg": "成功",
+  "data": {
+    "patientId": "1234",
+    "patientName": "张三",
+    "medicalRecordNo": "L0014976",
+    "tenantId": "92fcd655-ebc1-450b-a0c9-d33958d07345",
+    "storeId": "1",
+    "appointmentId": "1234",
+    "appointmentStatus": "40"
+  }
+}
 ```
 
-### Advanced Example
+### 2. 电子病历保存工具 (MedicalRecordTool)
 
-Run the advanced server example:
+**功能描述**: 保存完整的电子病历信息到数据库
 
-```bash
-# Development mode (TypeScript)
-npm run example:advanced
+**输入参数**:
+- **必需参数**:
+  - `tenantId`: 租户ID
+  - `storeId`: 门店ID  
+  - `patientId`: 患者ID
+  - `appointmentId`: 预约单ID
+  - `medicalRecordNo`: 病历号
 
-# With specific arguments
-npx ts-node examples/advanced-server.ts --stdio
-npx ts-node examples/advanced-server.ts --port=3002
+- **可选参数** (医疗记录详情):
+  - `chiefComplaint`: 主诉
+  - `history`: 现病史
+  - `pastHistory`: 既往史
+  - `oralCheck`: 口腔检查
+  - `diagnose`: 诊断
+  - `plan`: 治疗计划
+  - `cure`: 治疗方案
+  - `advice`: 医嘱
+  - `radiologyCheck`: 辅助检查
+
+**返回数据**:
+```json
+{
+  "code": 200,
+  "msg": "成功",
+  "data": "123"
+}
 ```
 
-## Examples Overview
+## 🛠️ 技术特点
 
-### Basic Server (`basic-server.ts`)
-
-Demonstrates:
-- Simple tool creation using decorators
-- Basic server setup
-- STDIO and SSE modes
-
-Features:
-- Calculator tool with basic math operations
-
-### Advanced Server (`advanced-server.ts`)
-
-Demonstrates:
-- Multiple custom tools
-- Resource management
-- Prompt generation
-- Complex tool implementations
-
-Features:
-- HTTP request tool
-- Text processing tool
-- Configuration resource
-- Code review prompt
-
-## Creating Your Own Server
-
-### 1. Basic Setup
+### 装饰器驱动开发
+项目使用 `@Tool` 装饰器来定义工具，提供了清晰的元数据声明：
 
 ```typescript
-import { createMCPServer, BaseTool, Tool } from '@zhama/mcp-server';
-
-// Create your custom tool
 @Tool({
-  name: 'my-tool',
-  description: 'Description of my tool',
-  parameters: [
-    {
-      name: 'param1',
-      type: 'string',
-      description: 'Parameter description',
-      required: true
-    }
-  ]
+    name: 'saveMedicalRecord',
+    description: 'Save medical record to database/保存电子病历',
+    parameters: [
+      {
+        name: 'tenantId',
+        type: 'string',
+        description: 'The tenant id/租户id',
+        required: true
+      }
+      // ... 更多参数
+    ]
 })
-class MyTool extends BaseTool {
-  protected toolDefinition = {
-    name: 'my-tool',
-    description: 'Description of my tool',
-    parameters: []
-  };
-
-  protected async executeInternal(parameters: Record<string, unknown>): Promise<unknown> {
-    // Your tool logic here
-    return { result: 'success' };
-  }
+export class MedicalRecordTool extends BaseTool {
+    // 工具实现
 }
-
-// Create and run the server
-const server = createMCPServer('my-server', '1.0.0')
-  .description('My custom MCP server')
-  .enableTools()
-  .addTool(new MyTool());
-
-await server.runStdio();
 ```
 
-### 2. Adding Resources
+### 环境配置管理
+使用 Zod 进行严格的环境变量验证：
 
 ```typescript
-import { BaseResource, Resource } from '@zhama/mcp-server';
-
-class MyResource extends BaseResource {
-  protected resourceDefinition = {
-    type: 'application/json' as const,
-    description: 'My custom resource'
-  };
-
-  protected async executeInternal(content: string): Promise<Resource> {
-    return {
-      id: 'my-resource',
-      uri: 'resource://my-resource',
-      name: 'My Resource',
-      description: 'Custom resource description',
-      type: 'application/json',
-      content: JSON.stringify({ data: 'example' })
-    };
-  }
-}
-
-// Add to server
-server.enableResources().addResource(new MyResource());
-```
-
-### 3. Adding Prompts
-
-```typescript
-import { BasePrompt, Prompt } from '@zhama/mcp-server';
-
-class MyPrompt extends BasePrompt {
-  protected promptDefinition = {
-    type: 'text' as const,
-    description: 'My custom prompt'
-  };
-
-  protected async executeInternal(content: string): Promise<Prompt> {
-    return {
-      id: 'my-prompt',
-      name: 'My Prompt',
-      description: 'Custom prompt description',
-      type: 'text',
-      content: `Custom prompt content: ${content}`
-    };
-  }
-}
-
-// Add to server
-server.enablePrompts().addPromptGenerator('my-prompt', async () => {
-  const prompt = new MyPrompt();
-  return await prompt.execute('default content');
+const envSchema = z.object({
+  PORT: z.string().transform(Number).default('3000'),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  API_TIMEOUT: z.string().transform(Number).default('30000')
 });
 ```
 
-## Running Modes
+### 多运行模式支持
+- **STDIO 模式**: 适用于 Claude Desktop 集成
+- **SSE 模式**: 适用于 Web 应用程序
 
-### STDIO Mode
+## 🔧 安装和使用
 
-Best for Claude Desktop integration:
+### 环境要求
+- Node.js >= 18.0.0
+- npm >= 8.0.0
 
+### 安装依赖
 ```bash
-node dist/server.js --stdio
+npm install
 ```
 
-### SSE Mode
-
-Best for web applications:
-
+### 开发模式运行
 ```bash
-node dist/server.js --port=3000
+# TypeScript 开发模式
+npm run dev
+
+# 或指定运行模式
+npm run dev:stdio
 ```
 
-## Server Configuration Options
+### 生产模式运行
+```bash
+# 构建项目
+npm run build
 
-The server builder supports various configuration options:
+# STDIO 模式启动
+node dist/index.js --stdio
 
-```typescript
-const server = createMCPServer('server-name', '1.0.0')
-  .description('Server description')
-  .author('Your Name')
-  .license('MIT')
-  .enableTools({ listChanged: true })
-  .enableResources({ subscribe: true, listChanged: true })
-  .enablePrompts({ listChanged: true })
-  .enableLogging('info')
-  .enableSampling({ completions: true, chat: true })
-  .enableRoots({ listChanged: true });
+# SSE 模式启动（默认端口3000）
+node dist/index.js
 ```
 
-## TypeScript Configuration
+## 📦 核心依赖
 
-Make sure your `tsconfig.json` includes:
+- `@zhama/mcp-server`: MCP 服务器框架
+- `zod`: 类型安全的数据验证
+- `dotenv`: 环境变量管理
+- `typescript`: TypeScript 支持
 
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "target": "ES2020",
-    "module": "commonjs",
-    "strict": true
-  }
-}
-```
+## 🎯 应用场景
 
-## Error Handling
+此 MCP 服务器特别适用于：
 
-All tools automatically handle errors and return proper MCP responses. Custom error handling can be added in your `executeInternal` method:
+1. **医疗机构管理系统**: 多租户医疗数据管理
+2. **AI 医疗助手**: 为 AI 模型提供结构化医疗数据访问
+3. **电子病历系统**: 标准化病历信息存储和检索
+4. **医疗数据集成**: 统一的医疗数据访问接口
 
-```typescript
-protected async executeInternal(parameters: Record<string, unknown>): Promise<unknown> {
-  try {
-    // Your logic here
-    return { result: 'success' };
-  } catch (error) {
-    // This error will be caught by the base class and properly formatted
-    throw new Error(`Tool execution failed: ${error.message}`);
-  }
-}
-```
+## 📄 许可证
 
-## Best Practices
+MIT
 
-1. **Tool Names**: Use clear, descriptive names
-2. **Parameters**: Always validate input parameters
-3. **Error Messages**: Provide helpful error messages
-4. **Logging**: Use the built-in logger for debugging
-5. **Type Safety**: Leverage TypeScript for better development experience
+---
 
-## Need Help?
-
-Check out the MCP documentation and the source code for more advanced usage patterns. 
+*本项目基于 @zhama/mcp-server 框架构建，专注于医疗健康领域的数据管理和 AI 集成。* 
