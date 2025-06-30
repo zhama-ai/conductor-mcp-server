@@ -8,7 +8,7 @@ dotenv.config();
 // GOOGLE_SEARCH_ENGINE_ID=9212554642e204c7a
 // Define validation schema for environment variables
 const envSchema = z.object({
-  PORT: z.string().transform(Number).default('10000'),
+  PORT: z.string().transform(Number).default('3000'),
   NODE_ENV: z
     .enum(['development', 'production', 'test'])
     .default('development'),
