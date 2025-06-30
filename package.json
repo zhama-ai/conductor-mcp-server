@@ -1,0 +1,68 @@
+{
+  "name": "mcp-demo",
+  "version": "1.0.0",
+  "description": "A TypeScript-based MCP (Model Context Protocol) server framework for building unified AI servers",
+  "scripts": {
+    "clean": "rm -rf dist && rm -rf src/*.js src/**/*.js src/**/*.js.map && rm -rf examples/*.js examples/**/*.js examples/**/*.js.map",
+    "build": "npm run clean && tsc",
+    "lint": "eslint . --ext .ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:stdio": "ts-node-dev --respawn --transpile-only src/index.ts --stdio",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "server",
+    "typescript",
+    "claude",
+    "framework",
+    "tools",
+    "resources",
+    "prompts",
+    "zhama"
+  ],
+  "author": {
+    "name": "zhama-ai Team",
+    "email": "team@zhama.ai",
+    "url": "https://zhama.ai"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhama-ai/mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zhama-ai/mcp-server/issues"
+  },
+  "homepage": "https://github.com/zhama-ai/mcp-server#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@zhama/mcp-server": "^1.1.0",
+    "dotenv": "^16.5.0",
+    "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.1",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
+    "eslint": "^9.28.0",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.5.0"
+  }
+}
