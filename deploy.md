@@ -4,7 +4,7 @@
 
 - 操作系统要求Linux Kernal 3.10 以上，推荐使用ubuntu 22.04/debian bullsys
 - 安装docker,docker compose插件,安装bzip2解压
-- 请下载整个安装包: https://zhama-public.oss-cn-heyuan.aliyuncs.com/conductor-dist.tar.bz2
+- 请下载整个安装包: [https://zhama-public.oss-cn-heyuan.aliyuncs.com/conductor-dist.tar.bz2](https://zhama-public.oss-cn-heyuan.aliyuncs.com/conductor-dist.tar.gz.bz2)
 - 执行以下脚本解压
   
 ```bash
