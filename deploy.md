@@ -25,7 +25,11 @@ bash install.sh
 ```
 
 
+### 3、加载镜像
 
+```
+docker load -i all-images.tar
+```
 
 ### 3、配置服务器
 
