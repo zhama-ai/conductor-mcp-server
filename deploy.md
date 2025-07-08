@@ -31,7 +31,7 @@ bash install.sh
 docker load -i all-images.tar
 ```
 
-### 3、配置服务器
+### 4、配置服务器
 
 docker-compose.yml
 
@@ -51,4 +51,12 @@ docker-compose.yml
 3. conductor-web:
     - DASHSCOPE_API_KEY: 阿里云百炼apikey(如果VOICE_PROVIDER为aliyun，则必须填。否则可以为空)
     - VOICE_PROVIDER: 语音识别方式:native或者aliyun
+      
+### 5、数据库初始化
+
+下载文件，wget https://zhama-public.oss-cn-heyuan.aliyuncs.com/volumes.tar.gz
+在docker-compose.yml目录下解压，然后docker compose up -d 启动服务
+默认web端口为40000
+http://192.168.0.1:40000/dashboard?front_token=1111
+
 
